@@ -4,7 +4,6 @@
 import pandas as pd
 import numpy as np
 import datetime as dt
-import chainladder as cl
 from dateutil.relativedelta import relativedelta
 
 # global parameters
@@ -32,6 +31,11 @@ def generate_policies(uw_start_date,
     policy_risk_factors_1 = np.random.normal(size=n_policies)
     policy_risk_factors_2 = np.random.normal(size=n_policies)
     policy_risk_factors_3 = np.random.normal(size=n_policies)
+    policy_risk_factors_4 = np.random.normal(size=n_policies)
+    policy_risk_factors_5 = np.random.normal(size=n_policies)
+    policy_risk_factors_6 = np.random.normal(size=n_policies)
+    policy_risk_factors_7 = np.random.normal(size=n_policies)
+    policy_risk_factors_8 = np.random.normal(size=n_policies)
     
     # build the dataframe
     db_policies = pd.DataFrame({'Class_name': class_name,
@@ -43,6 +47,11 @@ def generate_policies(uw_start_date,
                               'Policy_risk_factor_1':policy_risk_factors_1,
                               'Policy_risk_factor_2':policy_risk_factors_2,
                               'Policy_risk_factor_3':policy_risk_factors_3,
+                              'Policy_risk_factor_4':policy_risk_factors_4,
+                              'Policy_risk_factor_5':policy_risk_factors_5,
+                              'Policy_risk_factor_6':policy_risk_factors_6,
+                              'Policy_risk_factor_7':policy_risk_factors_7,
+                              'Policy_risk_factor_8':policy_risk_factors_8,
                               'Insured_limit':insured_limit,
                               'Insured_excess':insured_excess})
     db_policies.set_index('Policy_ID', inplace=True)
@@ -173,31 +182,14 @@ def generate_ultimate_portfolio(
         # scale down policy number with growth rate
         n_policies = int(n_policies * (1-historic_policy_growth))
 
-    db_policy = pd.concat(db_policy)
+    db_ult_policy = pd.concat(db_policy)
     
-    stats = summary_stats(db_policy)
     
-    return db_policy, stats
+    return db_ult_policy
 
-def summary_stats(db):
-    '''
-    generate summary statistics by year
-    '''
-    
-    db['UW_year'] = db['Start_date'].dt.year
-    stats = db.groupby('UW_year').agg({
-            'Start_date':'count',
-            'Policy_premium':np.sum,
-            'Claim_value':np.sum
-                      })
-    stats['Loss_ratio'] = stats['Claim_value']/stats['Policy_premium']
-    stats.rename({'Start_date':'Policies_written'}, axis='columns', inplace=True)
-    return stats
-
-def summary_triangles(data, reporting_date):
+def asat_filtering(data, reporting_date):
     '''
     Remove all data which is not know at the reporting date and convert data into triangles, for further analysis
-    Returns 'chainladder' triangles
     '''
     #    
     #fileter out all data not known at reporting date
@@ -223,77 +215,72 @@ def summary_triangles(data, reporting_date):
     data_triangles.loc[date_mask_paid, 'Claim_count_paid'] = 1
 
     # remove unwritten policies
-    data_policies = data_triangles.loc[~date_mask_notwritten].copy()    
+    data_asat_policies = data_triangles.loc[~date_mask_notwritten].copy()    
 
-    tri_paid = cl.Triangle(data_policies, 
-                    origin='Start_date',
-                    index='Class_name',
-                    development='Claim_payment_date',
-                    columns='Claim_value',
-                    cumulative=False).incr_to_cum().to_frame().reset_index().melt(id_vars="index", var_name='Development Month', value_name='Paid Value').rename({'index':'Origin Month'}, axis='columns')
-
-
-    tri_paid_count = cl.Triangle(data_policies, 
-                    origin='Start_date',
-                    index='Class_name',
-                    development='Claim_payment_date',
-                    columns='Claim_count_paid',
-                    cumulative=False).incr_to_cum().to_frame().reset_index().melt(id_vars="index", var_name='Development Month', value_name='Paid Count').rename({'index':'Origin Month'}, axis='columns')
-
-    
-    tri_reported = cl.Triangle(data_policies, 
-                    origin='Start_date',
-                    index='Class_name',
-                    development='Claim_report_date',
-                    columns='Claim_value',
-                    cumulative=False).incr_to_cum().to_frame().reset_index().melt(id_vars="index", var_name='Development Month', value_name='Reported Value').rename({'index':'Origin Month'}, axis='columns')
-
-
-    tri_reported_count = cl.Triangle(data_policies, 
-                    origin='Start_date',
-                    index='Class_name',
-                    development='Claim_report_date',
-                    columns='Claim_count_reported',
-                    cumulative=False).incr_to_cum().to_frame().reset_index().melt(id_vars="index", var_name='Development Month', value_name='Reported Count').rename({'index':'Origin Month'}, axis='columns')
-
-
-    tri_premium = cl.Triangle(data_policies, 
-                    origin='Start_date',
-                    index='Class_name',
-                    development='Policy_premium_date',
-                    columns='Policy_premium',
-                    cumulative=False).incr_to_cum().to_frame().reset_index().melt(id_vars="index", var_name='Development Month', value_name='Premium Value').rename({'index':'Origin Month'}, axis='columns')
-
-    #join all triangles together into a single dataframe
-    join_cols = ['Origin Month', 'Development Month']
-    tri_all = tri_paid.merge(tri_paid_count, on=join_cols)
-    tri_all = tri_paid.merge(tri_reported, on=join_cols)
-    tri_all = tri_all.merge(tri_reported_count, on=join_cols)
-    tri_all = tri_all.merge(tri_premium, on=join_cols)
         
-    return tri_all, data_policies
+    return data_asat_policies
 
 #%%
 
-# run code to test
+def summary_stats(db_ult, db_asat = None):
+    '''
+    generate summary statistics by year
+    '''
+    
+    db_ult['UW_year'] = db_ult['Start_date'].dt.year
+    db_ult['Claim_count'] = db_ult['Claim_value']
+    stats = db_ult.groupby('UW_year').agg({
+            'Start_date':'count',
+            'Policy_premium':np.sum,
+            'Claim_value':np.sum,
+            'Claim_count':'count'
+                      })
+    stats['Loss_ratio_ult'] = stats['Claim_value']/stats['Policy_premium']
+
+    stats.rename({'Start_date':'Policy_count_ult',
+                  'Policy_premium':'Policy_premium_ult',
+                  'Claim_value':'Claim_value_ult',
+                  'Claim_count':'Claim_count_ult'}, axis='columns', inplace=True)
+
+    #########################
+    #if second data set in included
+    if db_asat is not None:
+        db_asat['UW_year'] = db_asat['Start_date'].dt.year
+        db_asat['Claim_count'] = db_asat['Claim_value']
+
+        stats2 = db_asat.groupby('UW_year').agg({
+                'Start_date':'count',
+                'Policy_premium':np.sum,
+                'Claim_value':np.sum,
+                'Claim_count':'count'
+                          })
+        stats2['Loss_ratio_inc'] = stats2['Claim_value']/stats2['Policy_premium']
+
+        stats2.rename({'Start_date':'Policy_count_inc',
+                  'Policy_premium':'Policy_premium_inc',
+                  'Claim_value':'Claim_value_inc',
+                  'Claim_count':'Claim_count_inc'}, axis='columns', inplace=True)
+        
+        stats = stats.join(stats2)
+
+
+
+    return stats
+
+
+#%% run code to test
 if __name__ == '__main__':
+
+
     uw_start_date = dt.datetime.strptime('01/01/2019', '%d/%m/%Y')
-    
-    data_m, stats_m = generate_ultimate_portfolio(class_name='Motor', historic_years=10, uw_start_date=uw_start_date)
-
-    #
-    # build chainladder triangles
-    #
-
     reporting_date = dt.datetime.strptime('31/12/2019', '%d/%m/%Y')
-    triangles_all, data_policies = summary_triangles(data_m, reporting_date)
+
+    db_data = generate_ultimate_portfolio(class_name='Motor', historic_years=10, uw_start_date=uw_start_date)
+    db_asat_data = asat_filtering(db_data, reporting_date)
     
-    #
-    # export as csv file
-    #
-    
-    tri_all.to_csv('triangles.csv')
-                
+    stats = summary_stats(db_data,db_asat_data)
+
+
     
         
         
