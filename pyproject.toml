@@ -1,0 +1,16 @@
+[build-system]
+requires = ["setuptools>=61.0.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = 'general_insurance_data_model'
+version='0.0.1'
+description = "Generate insurance data for testing and demonstrations"
+url = 
+authors = [
+  { name="Peter Dyson", email="peter@dysonmail.me" },
+]
+license='GNU3.0',
+
+[project.urls]
+Homepage = 'https://github.com/pjdyson/general_insurance_data_model'

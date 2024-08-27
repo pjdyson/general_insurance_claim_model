@@ -2,7 +2,7 @@
 from setuptools import setup, find_packages
 from os import listdir
 
-descr = "general_insurance_data_model"
+descr = "Generate insurance data for testing and demonstrations"
 name = 'general_insurance_data_model'
 url = 'https://github.com/pjdyson/general_insurance_data_model'
 version='0.0.1' # Put this in __init__.py
@@ -12,8 +12,8 @@ setup(
     version=version,
     maintainer='Peter Dyson',
     maintainer_email='peter@dysonmail.com',
-    download_url='{}/archive/v{}.tar.gz'.format(url, version),
-    license='GPL3.0',
+    download_url=f'{url}/archive/v{version}.tar.gz',
+    license='GNU3.0',
     url=url,
     description=descr,
     install_requires=[

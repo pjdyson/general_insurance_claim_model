@@ -1,0 +1,5 @@
+
+pandas>=0.23.0
+numpy>=2.1.0
+chainladder>=0.8.23
+build
