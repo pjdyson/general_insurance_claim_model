@@ -6,7 +6,7 @@ build-backend = "setuptools.build_meta"
 name = 'general_insurance_data_model'
 version='0.0.1'
 description = "Generate insurance data for testing and demonstrations"
-url = 
+url = "https://github.com/pjdyson/general_insurance_data_model/"
 authors = [
   { name="Peter Dyson", email="peter@dysonmail.me" },
 ]
