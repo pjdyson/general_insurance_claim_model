@@ -37,7 +37,7 @@ jobs:
 
     environment:
         name: pypi
-        url: https://test.pypi.org/p/general_insurance_data_model
+        url: https://test.pypi.org/p/general_insurance_data_model # remove test. for pypi
 
     permissions:
         id-token: write  # IMPORTANT: mandatory for trusted publishing
@@ -50,3 +50,5 @@ jobs:
         path: dist/
     - name: Publish distribution 📦 to PyPI
       uses: pypa/gh-action-pypi-publish@release/v1
+      with: # only for test pypi
+        repository-url: https://test.pypi.org/legacy/
