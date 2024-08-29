@@ -1,4 +1,4 @@
-name: test build
+name: check build
 on: push
 
 jobs:
@@ -24,3 +24,4 @@ jobs:
       uses: actions/upload-artifact@v3
       with:
         name: python-package-distributions
+        path: dist/
