@@ -6,8 +6,14 @@ build-backend = "setuptools.build_meta"
 name = 'general_insurance_data_model'
 version='0.0.1'
 description = "Generate insurance data for testing and demonstrations"
-url = "https://github.com/pjdyson/general_insurance_data_model/"
+readme = "README.md"
+keywords = ["actuarial", "insurance", "reserving", "pricing"]
 authors = [
   { name="Peter Dyson", email="peter@dysonmail.me" },
 ]
 license={file='LICENSE.txt'}
+dependencies = [
+  'pandas>=2.2.0',
+  'numpy>=1.26.4',
+  'chainladder>=0.8.23',
+]
