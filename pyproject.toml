@@ -10,7 +10,4 @@ url = "https://github.com/pjdyson/general_insurance_data_model/"
 authors = [
   { name="Peter Dyson", email="peter@dysonmail.me" },
 ]
-license='GNU3.0',
-
-[project.urls]
-Homepage = 'https://github.com/pjdyson/general_insurance_data_model'
+license='GNU3.0'
