@@ -15,5 +15,4 @@ license={file='LICENSE.txt'}
 dependencies = [
   'pandas>=1.5.0',
   'numpy==1.26.4',
-  'chainladder>=0.8.20',
 ]
