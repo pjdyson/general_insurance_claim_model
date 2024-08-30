@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = 'general_insurance_data_model'
-version='0.0.5'
+version='0.0.6'
 description = "Generate insurance data for testing and demonstrations"
 readme = "README.md"
 keywords = ["actuarial", "insurance", "reserving", "pricing"]
