@@ -8,10 +8,18 @@ While there is really no substitute for real data, this is often commercially se
 
 ## Example of use
 
-### generating ultimate portfolio
+### Installation
+```
+pip install general-insurance-data-model
+```
+
+### Generating insurnace portfolio (ultimate)
 The first function generates an ultimate policy and claims DataFrame:
 ```
-data_ultimate_m = gidm.generate_ultimate_portfolio(
+import general_insurance_data_model.generators as gt
+import datetime as dt
+
+data_ultimate_m = gt.generate_ultimate_portfolio(
     class_name='Motor', 
     uw_start_date=dt.datetime.strptime('01/01/2019', '%d/%m/%Y'),
     historic_years=12,
@@ -19,7 +27,7 @@ data_ultimate_m = gidm.generate_ultimate_portfolio(
 ```
 Other parameters can be tuned to set claim reporting and paid delays.
 
-### filter for reporting date
+### filter for reporting date (reported)
 
 There is a second function which filters based on a reporting date
 - policies written after the reporting date are removed
